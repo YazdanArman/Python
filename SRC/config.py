@@ -2,7 +2,23 @@ from pyModbusTCP.client import ModbusClient
 from pyModbusTCP import utils
 from time import sleep
 
-client = ModbusClient(host = "192.168.1.238", port = 502, auto_open = True, auto_close = True, timeout = 0.1, debug = False)
+sensor_type_deactivate = 0b00
+sensor_type_on_timer = 0b01
+sensor_type_edge = 0b10
+sensor_type_both = 0b11
+
+
+def convert_sensor_to_deci(sensor):
+    total = 0b0
+    com = 0b1
+
+    for i in sensor:
+        total += i * com
+        com *= 0b100
+    return total
+
+
+client = ModbusClient(host="192.168.1.238", port=502, auto_open=True, auto_close=True, timeout=0.1, debug=False)
 
 client.unit_id(13)
 
@@ -18,12 +34,12 @@ ModbusTCP_ADRESS_MAC_3rd_Byte = 7
 ModbusTCP_ADRESS_MAC_4th_Byte = 8
 ModbusTCP_ADRESS_MAC_5th_Byte = 9
 ModbusTCP_ADRESS_MAC_6th_Byte = 10
-ModbusTCP_ADRESS_RS485_serial_baud_rate = 11;
-ModbusTCP_ADRESS_RS485_serial_setting = 12;
-ModbusTCP_ADRESS_num_of_sensor_per_station = 13;
-ModbusTCP_ADRESS_station_address = 14;
-ModbusTCP_ADRESS_PLC_offset = 15;
-ModbusTCP_ADRESS_onboard_inputs_data_type = 16;
+ModbusTCP_ADRESS_RS485_serial_baud_rate = 11
+ModbusTCP_ADRESS_RS485_serial_setting = 12
+ModbusTCP_ADRESS_num_of_sensor_per_station = 13
+ModbusTCP_ADRESS_station_address = 14
+ModbusTCP_ADRESS_PLC_offset = 15
+ModbusTCP_ADRESS_onboard_inputs_data_type = 16
 
 # baud_list   = [300,          #0
 #                1200,         #1
@@ -49,7 +65,6 @@ ModbusTCP_ADRESS_onboard_inputs_data_type = 16;
 #                        ];
 
 
-
 client.write_single_register(ModbusTCP_ADRESS_IP_1st_Byte, 192)
 client.write_single_register(ModbusTCP_ADRESS_IP_2nd_Byte, 168)
 client.write_single_register(ModbusTCP_ADRESS_IP_3rd_Byte, 1)
@@ -62,18 +77,22 @@ client.write_single_register(ModbusTCP_ADRESS_MAC_4th_Byte, int("0x83", 16))
 client.write_single_register(ModbusTCP_ADRESS_MAC_5th_Byte, int("0x84", 16))
 client.write_single_register(ModbusTCP_ADRESS_MAC_6th_Byte, int("0x85", 16))
 
-client.write_single_register(ModbusTCP_ADRESS_RS485_serial_baud_rate, 5)             #5
-client.write_single_register(ModbusTCP_ADRESS_RS485_serial_setting, 4)               #4
+client.write_single_register(ModbusTCP_ADRESS_RS485_serial_baud_rate, 5)  # 5
+client.write_single_register(ModbusTCP_ADRESS_RS485_serial_setting, 4)  # 4
 
-client.write_single_register(ModbusTCP_ADRESS_num_of_sensor_per_station, 5)          #5
-client.write_single_register(ModbusTCP_ADRESS_station_address, 1)                    #1
-client.write_single_register(ModbusTCP_ADRESS_PLC_offset, 30)                        #40
+client.write_single_register(ModbusTCP_ADRESS_num_of_sensor_per_station, 5)  # 5
+client.write_single_register(ModbusTCP_ADRESS_station_address, 1)  # 1
+client.write_single_register(ModbusTCP_ADRESS_PLC_offset, 30)  # 40
 
-client.write_single_register(ModbusTCP_ADRESS_onboard_inputs_data_type, 938)
+# sensor_type = [sensor1,sensor2,sensor3,sensor4,virtual_sensor]
+sensor_type = [sensor_type_deactivate, sensor_type_deactivate, sensor_type_deactivate, sensor_type_deactivate, sensor_type_deactivate]
+
+client.write_single_register(ModbusTCP_ADRESS_onboard_inputs_data_type, convert_sensor_to_deci(sensor_type))
+
 # 341 all inputs send on_timer data
 # 853 input 1, 2, 3, 4 send on_timer and input 5 sends edge and on_timer
 # 1023 all inputs send edge and on_timer
 # 938 input 1, 2, 3, 4 send edge and input 5 sends edge and on_timer
 
-client.write_single_coil(ModbusTCP_ADRESS_config_change_flag, 1)
-#final
+client.write_single_coil(ModbusTCP_ADRESS_config_change_flag, True)
+# final

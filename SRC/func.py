@@ -297,7 +297,7 @@ def turn_off_virtual_input(virtual_input_id):
 
 def read_input_status():
     client.unit_id(13)
-    state = client.read_coils(11, 4)
+    state = client.read_coils(11, 5)
 
     if (state):
         return state
@@ -306,8 +306,8 @@ def read_input_status():
 client = ModbusClient(host = "192.168.1.238", port = 502, auto_open = True, auto_close = True, timeout = 2.2, debug = False)
 # client.unit_id(13)
 
-# q = Read_PM2100(client, 3)
-# print(q)
+q = Read_PM2100(client, 3)
+print(q)
 
 # q = Read_PM2100(client, 4)
 # print(q)
@@ -319,10 +319,10 @@ client = ModbusClient(host = "192.168.1.238", port = 502, auto_open = True, auto
 
 
 
-while(1):
-    # print(read_input_status())
-    read_on_timer()
-    # read_temperature()
-    # read_onBoard_sensors()
-    # read_num_of_data_in_queue()
-    # sleep(0.5)
+# while(1):
+#     # print(read_input_status())
+#     # read_on_timer()
+#     # read_temperature()
+#     read_onBoard_sensors()
+#     # read_num_of_data_in_queue()
+#     # sleep(0.5)
