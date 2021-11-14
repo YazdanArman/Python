@@ -303,7 +303,7 @@ def read_input_status():
         return state
 
 
-client = ModbusClient(host = "192.168.1.238", port = 502, auto_open = True, auto_close = True, timeout = 2.2, debug = False)
+client = ModbusClient(host = "192.168.1.237", port = 502, auto_open = True, auto_close = True, timeout = 2.2, debug = False)
 # client.unit_id(13)
 
 q = Read_PM2100(client, 3)
